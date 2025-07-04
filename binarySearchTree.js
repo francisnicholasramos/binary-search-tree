@@ -68,8 +68,53 @@ class Tree {
     return this.find(value, root.rightChild);
   } 
 
+  levelOrder(root=this.root, level=0, queue=[]) {
+    if (root === null) return;
+
+    if (queue.length <= level) queue.push([])
+
+    queue[level].push(root.value)
+
+    this.levelOrder(root.leftChild, level+1, queue)
+    this.levelOrder(root.rightChild, level+1, queue)
+
+    return queue.flat();
+  }
+
+  preOrder(root=this.root, list=[]) {
+    if (root === null) return;
+
+    list.push(root.value)
+    this.preOrder(root.leftChild, list)
+    this.preOrder(root.rightChild, list)
+    
+    return list
+  }
+
+  inOrder(root=this.root, list=[]) {
+    if (root === null) return;
+
+    this.inOrder(root.leftChild, list)
+    list.push(root.value)
+    this.inOrder(root.rightChild, list)
+
+    return list;
+  }
+
+  postOrder(root=this.root, list=[]) {
+    if (root === null) return;
+
+    this.postOrder(root.leftChild, list)
+    this.postOrder(root.rightChild, list)
+    list.push(root.value)
+
+    return list;
+  }
+
   // TODO
-  levelOrder(callback) {}
+  height(value) {
+
+  }
 
   prettyPrint(node = this.root, prefix = '', isLeft = true) {
     if (node === null) return;
@@ -88,7 +133,7 @@ class Tree {
     console.log('Current root:', root.leftChild.value)
   };
 
-  // helper methods
+  // helper method
   minValue(root) {
     let min = root.value;
 
@@ -108,9 +153,11 @@ class Node {
   }
 }
 
-let arr = [27,10,23,2,18,5,9]
+// let arr = [27,10,23,2,18,5,9]
 
+let arr = [1,7,4,23,8,9,4,3,5,7,9,67,6345,324]
 
 let test = new Tree(arr);
 test.prettyPrint()
-console.log(test.find(9))
+
+
