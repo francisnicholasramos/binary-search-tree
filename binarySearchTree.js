@@ -68,17 +68,20 @@ class Tree {
     return this.find(value, root.rightChild);
   } 
 
-  levelOrder(root=this.root, level=0, queue=[]) {
+  levelOrder(arr = [], queue = [], root = this.root) {
     if (root === null) return;
+    arr.push(root.value);
 
-    if (queue.length <= level) queue.push([])
+    queue.push(root.leftChild);
+    queue.push(root.rightChild);
 
-    queue[level].push(root.value)
+    while (queue.length) {
+      const level = queue[0];
+      queue.shift();
+      this.levelOrder(arr, queue, level)
+    }
 
-    this.levelOrder(root.leftChild, level+1, queue)
-    this.levelOrder(root.rightChild, level+1, queue)
-
-    return queue.flat();
+    return arr;
   }
 
   preOrder(root=this.root, list=[]) {
@@ -111,9 +114,52 @@ class Tree {
     return list;
   }
 
-  // TODO
+  // height of the node
   height(value) {
+    const node = this.find(value, this.root);
+    if (!node) return null;
 
+    function getHeight(root) { 
+      if (root === null) return -1;
+
+      let left = getHeight(root.leftChild);
+      let right = getHeight(root.rightChild);
+
+      return Math.max(left, right) + 1;
+    }
+
+    return getHeight(node);
+  }
+
+  // depth of the node
+  depth(value, root=this.root, depth=0) {
+    if (value === null || root === null) return null;
+
+    if (value === root.value) return `Depth: ${depth}`;
+    if (value < root) {
+      return this.depth(value, root.leftChild, depth+=1)
+    } else {
+      return this.depth(value, root.rightChild, depth+=1)
+    }
+  }
+
+  isBalanced(root=this.root) {
+    if (root === null) return true;
+
+    let left = this.heightOfTree(root.leftChild)
+    let right = this.heightOfTree(root.rightChild)
+
+    let diff = Math.abs(left - right);
+    
+    if (diff > 1) return false;
+
+    return this.isBalanced(root.leftChild) && this.isBalanced(root.rightChild);
+  }
+
+  rebalance(root=this.root) {
+    let arr = this.levelOrder([], [], root);
+    arr.sort((a,b) => a - b);
+    return this.root = this.buildTree(arr)
   }
 
   prettyPrint(node = this.root, prefix = '', isLeft = true) {
@@ -128,12 +174,11 @@ class Tree {
     }
   };
 
-
   log(root = this.root) {
     console.log('Current root:', root.leftChild.value)
   };
 
-  // helper method
+  // helper methods
   minValue(root) {
     let min = root.value;
 
@@ -143,6 +188,14 @@ class Tree {
     }
     return min;
   }
+
+  heightOfTree(root=this.root) {
+    if (root === null) return -1;
+    let left = this.heightOfTree(root.leftChild)
+    let right = this.heightOfTree(root.rightChild)
+    return Math.max(left, right) +1
+  }
+
 }
 
 class Node {
@@ -152,12 +205,3 @@ class Node {
     this.rightChild = null;
   }
 }
-
-// let arr = [27,10,23,2,18,5,9]
-
-let arr = [1,7,4,23,8,9,4,3,5,7,9,67,6345,324]
-
-let test = new Tree(arr);
-test.prettyPrint()
-
-
